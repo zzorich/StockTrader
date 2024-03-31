@@ -10,30 +10,38 @@ import SwiftUI
 @MainActor
 struct PortfolioView: View {
     @Environment(PortfolioViewModel.self) private var portfolio
+    @Environment(\.isSearching) private var isSearching
+    @Environment(SearchViewModel.self) private var searchViewModel
     var body: some View {
         List {
-            Section {
-                Text(Date.now.formatted(.dateTime))
-                    .font(.largeTitle)
-            }
-            Section("PORTFOLIO") {
-                assetsHeader
-                ForEach(portfolio.stocksOwned) { stock in
-                    if let stockQuote = portfolio.quote(of: stock.id) {
-                        OwnedStockInfoView(stock: stock, stockQuote: stockQuote)
+            if isSearching {
+                SearchView(searchItems: searchViewModel.searchItems)
+                    .onAppear(perform: {
+                        print("Test")
+                    })
+            } else {
+                Section {
+                    Text(Date.now.formatted(.dateTime))
+                        .font(.largeTitle)
+                }
+                Section("PORTFOLIO") {
+                    assetsHeader
+                    ForEach(portfolio.stocksOwned) { stock in
+                        if let stockQuote = portfolio.quote(of: stock.id) {
+                            OwnedStockInfoView(stock: stock, stockQuote: stockQuote)
+                        }
                     }
                 }
 
-            }
-
-            Section("FAVORITE") {
-                ForEach(portfolio.favorites) { stock in
-                    if let quote = portfolio.quote(of: stock) {
-                        FavoriteStockView(stock: stock, quote: quote)
+                Section("FAVORITE") {
+                    ForEach(portfolio.favorites) { stock in
+                        if let quote = portfolio.quote(of: stock) {
+                            FavoriteStockView(stock: stock, quote: quote)
+                        }
                     }
+                    .onDelete(perform: portfolio.removeFavoriteStocks(at:))
+                    .onMove(perform: portfolio.removeFavorites(from:to:))
                 }
-                .onDelete(perform: portfolio.removeFavoriteStocks(at:))
-                .onMove(perform: portfolio.removeFavorites(from:to:))
             }
         }
         .toolbar(content: {

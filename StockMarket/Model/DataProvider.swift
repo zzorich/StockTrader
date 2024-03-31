@@ -7,6 +7,3 @@
 
 import Foundation
 
-// Do backend data fetch
-enum DataProvider {
-}

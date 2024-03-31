@@ -35,6 +35,11 @@ struct StockQuote: POD {
     static let test: Self = .init(currentPrice: 1, change: 1, changeInPercent: 1, highPrice: 1, lowPrice: 1, openPrice: 1, previousClosePrice: 1)
 }
 
+struct CompanyProfile: POD {
+    let name: String
+    let ticker: String
+}
+
 
 struct StockIdentifier: Identifiable, Hashable, Equatable {
     let symbol: String
@@ -45,7 +50,7 @@ struct StockIdentifier: Identifiable, Hashable, Equatable {
 @Observable
 @MainActor
 class PortfolioViewModel {
-    @ObservationIgnored private var allStocks: [StockIdentifier: StockQuote] = [:]
+    private var allStocks: [StockIdentifier: StockQuote] = [:]
     private(set) var stocksOwned: [OwnedStockInfo] = []
     private(set) var favorites: [StockIdentifier] = []
     var cashBalance: Double = 25000
@@ -56,6 +61,15 @@ class PortfolioViewModel {
         }
     }
 
+
+}
+
+struct OwnedStockInfo: Identifiable {
+    let id: StockIdentifier
+    let numberOfSharesOwned = 1
+}
+// API Requests
+extension PortfolioViewModel {
     func addFavorite(stock: StockIdentifier) async throws {
         guard !favorites.contains(stock) else { return }
         guard !allStocks.keys.contains(stock) else { 
@@ -95,14 +109,6 @@ class PortfolioViewModel {
         model.allStocks[test2] = .test
         return model
     }()
-}
-
-struct OwnedStockInfo: Identifiable {
-    let id: StockIdentifier
-    let numberOfSharesOwned = 1
-}
-// API Requests
-extension PortfolioViewModel {
 
     func fetchQuote(of stock: StockIdentifier) async throws -> StockQuote {
         return .test

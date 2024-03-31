@@ -16,6 +16,8 @@
 		4FD3A00A2BB904EB00C5A20D /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD3A0092BB904EB00C5A20D /* DataProvider.swift */; };
 		4FD3A00C2BB9088800C5A20D /* PortfolioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD3A00B2BB9088800C5A20D /* PortfolioView.swift */; };
 		4FD3A00F2BB90D3300C5A20D /* StockInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD3A00E2BB90D3300C5A20D /* StockInfoView.swift */; };
+		4FD3A0112BB94DAE00C5A20D /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD3A0102BB94DAE00C5A20D /* SearchViewModel.swift */; };
+		4FD3A0132BB960AA00C5A20D /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD3A0122BB960AA00C5A20D /* SearchView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,8 @@
 		4FD3A0092BB904EB00C5A20D /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		4FD3A00B2BB9088800C5A20D /* PortfolioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioView.swift; sourceTree = "<group>"; };
 		4FD3A00E2BB90D3300C5A20D /* StockInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockInfoView.swift; sourceTree = "<group>"; };
+		4FD3A0102BB94DAE00C5A20D /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		4FD3A0122BB960AA00C5A20D /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +89,7 @@
 			children = (
 				4FD3A0042BB8E56700C5A20D /* Portfolio.swift */,
 				4FD3A0092BB904EB00C5A20D /* DataProvider.swift */,
+				4FD3A0102BB94DAE00C5A20D /* SearchViewModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -95,6 +100,7 @@
 				4FD39FF62BB8E3E700C5A20D /* ContentView.swift */,
 				4FD3A00B2BB9088800C5A20D /* PortfolioView.swift */,
 				4FD3A00E2BB90D3300C5A20D /* StockInfoView.swift */,
+				4FD3A0122BB960AA00C5A20D /* SearchView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -176,8 +182,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				4FD3A0052BB8E56700C5A20D /* Portfolio.swift in Sources */,
+				4FD3A0112BB94DAE00C5A20D /* SearchViewModel.swift in Sources */,
 				4FD3A00F2BB90D3300C5A20D /* StockInfoView.swift in Sources */,
 				4FD3A00C2BB9088800C5A20D /* PortfolioView.swift in Sources */,
+				4FD3A0132BB960AA00C5A20D /* SearchView.swift in Sources */,
 				4FD39FF72BB8E3E700C5A20D /* ContentView.swift in Sources */,
 				4FD3A00A2BB904EB00C5A20D /* DataProvider.swift in Sources */,
 				4FD39FF52BB8E3E700C5A20D /* StockMarketApp.swift in Sources */,
