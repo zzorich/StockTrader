@@ -44,6 +44,7 @@ struct PortfolioView: View {
                 }
             }
         }
+        .navigationTitle("Stocks")
         .toolbar(content: {
             EditButton()
         })
@@ -69,4 +70,5 @@ struct PortfolioView: View {
 #Preview {
     PortfolioView()
         .environment(PortfolioViewModel.test)
+        .environment(SearchViewModel().self)
 }

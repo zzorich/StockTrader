@@ -30,27 +30,26 @@ struct SearchRequest: POD {
 class SearchViewModel {
     var searchKeyword: String = "" {
         didSet {
-            searchPublisher.send(searchKeyword)
+            searchQueryPublisher.send(searchKeyword)
         }
     }
     private var searchTask: DataTask<SearchResponse>?
-    private var oldSearchKeyword: String = ""
-    private var searchPublisher = PassthroughSubject<String, Never>()
+    private var searchQueryPublisher = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
     var searchItems: [String] = []
-    let searchTimer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { timer in
-
-    }
 
     init() {
-        searchPublisher
+        searchQueryPublisher
             .debounce(for: .seconds(0.005), scheduler: RunLoop.main)
                     .removeDuplicates()
                     .sink { [weak self] query in
-                        self?.search(with: query)
+                        if !query.isEmpty {
+                            self?.search(with: query)
+                        }
                     }
                     .store(in: &cancellables)
     }
+
     func search(with query: String) {
         searchTask?.cancel()
         searchTask = AF.request(requestHeader, method: .get, parameters: ["search_keyword": query])
@@ -58,16 +57,16 @@ class SearchViewModel {
 
         searchTask?.resume()
         Task(priority: .high) {
-            try await fetchSearchResults()
+            try await fetchSearchResults(query: query)
         }
     }
 
-    func fetchSearchResults() async throws {
+    func fetchSearchResults(query: String) async throws {
         guard let response = await searchTask?.response else { return }
+        guard query == searchKeyword else { return }
         switch response.result {
         case .success(let response):
-            guard response.searchKeyword == searchKeyword else { return }
-            searchItems = response.searchResults
+            self.searchItems = response.searchResults
         case .failure(let error):
             debugPrint(error)
             throw error
