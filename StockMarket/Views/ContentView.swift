@@ -7,16 +7,19 @@
 
 import SwiftUI
 
-@MainActor
 struct ContentView: View {
-    @State private var searchKeyword: String = ""
-    @Bindable private var searchViewModel = SearchViewModel()
+    @StateObject private var searchViewModel = SearchViewModel()
+    @State private var path: NavigationPath = .init()
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             PortfolioView()
-                .environment(searchViewModel)
+                .environmentObject(searchViewModel)        
+                .navigationDestination(for: SearchItem.self) { searchItem in
+                    DetailedStockInfoView(stockIdentifier: searchItem.companySymbol)
+                }
         }
-        .searchable(text: $searchViewModel.searchKeyword)
+        .searchable(text: $searchViewModel.searchKeyWord)
+
     }
 }
 

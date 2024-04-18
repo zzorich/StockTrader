@@ -8,14 +8,19 @@
 import SwiftUI
 
 struct SearchView: View {
-    let searchItems: [String]
+    let searchItems: [SearchItem]
     var body: some View {
-        ForEach(searchItems, id: \.self) { stock in
-            Text(stock)
+        ForEach(searchItems, id: \.companySymbol) { stock in
+            NavigationLink(value: stock) {
+                VStack(alignment: .leading) {
+                    Text(stock.companySymbol)
+                    Text(stock.companyDescription)
+                }
+            }
         }
     }
 }
 
 #Preview {
-    SearchView(searchItems: ["AAPL"])
+    SearchView(searchItems: [SearchItem(companySymbol: "AAPL", companyDescription: "AAPL INC")])
 }

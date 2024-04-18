@@ -11,14 +11,31 @@ import SwiftUI
 struct PortfolioView: View {
     @Environment(PortfolioViewModel.self) private var portfolio
     @Environment(\.isSearching) private var isSearching
-    @Environment(SearchViewModel.self) private var searchViewModel
+    @State private var isShowingErrorToast: (Bool, (any Error)?) = (false, nil)
+
+    @EnvironmentObject private var searchViewModel: SearchViewModel
+
     var body: some View {
         List {
             if isSearching {
-                SearchView(searchItems: searchViewModel.searchItems)
-                    .onAppear(perform: {
-                        print("Test")
-                    })
+                switch searchViewModel.state {
+                case .isLoading:
+                    ProgressView()
+                case .failed(let error):
+                    EmptyView()
+                        .onAppear(perform: {
+                            withAnimation {
+                                isShowingErrorToast = (true, error)
+                            } completion: {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    isShowingErrorToast = (false, nil)
+                                }
+                            }
+                        })
+                case .success(let searchItems):
+                    SearchView(searchItems: searchItems)
+                }
+
             } else {
                 Section {
                     Text(Date.now.formatted(.dateTime))
@@ -48,6 +65,7 @@ struct PortfolioView: View {
         .toolbar(content: {
             EditButton()
         })
+        .errorToasted(isShowingToast: $isShowingErrorToast)
     }
 
     var assetsHeader: some View {
@@ -70,5 +88,5 @@ struct PortfolioView: View {
 #Preview {
     PortfolioView()
         .environment(PortfolioViewModel.test)
-        .environment(SearchViewModel().self)
+        .environmentObject(SearchViewModel())
 }

@@ -48,13 +48,12 @@ struct StockIdentifier: Identifiable, Hashable, Equatable {
 }
 
 @Observable
-@MainActor
 class PortfolioViewModel {
-    private var allStocks: [StockIdentifier: StockQuote] = [:]
-    private(set) var stocksOwned: [OwnedStockInfo] = []
-    private(set) var favorites: [StockIdentifier] = []
-    var cashBalance: Double = 25000
-    var netWorth: Double {
+    @ObservationIgnored private var allStocks: [StockIdentifier: StockQuote] = [:]
+    @MainActor private(set) var stocksOwned: [OwnedStockInfo] = []
+    @MainActor private(set) var favorites: [StockIdentifier] = []
+    @MainActor var cashBalance: Double = 25000
+    @MainActor var netWorth: Double {
         stocksOwned.reduce(into: cashBalance) { partialResult, stock in
             guard let quote = quote(of: stock.id) else { return }
             partialResult += quote.currentPrice * Double(stock.numberOfSharesOwned)
@@ -69,6 +68,7 @@ struct OwnedStockInfo: Identifiable {
     let numberOfSharesOwned = 1
 }
 // API Requests
+@MainActor
 extension PortfolioViewModel {
     func addFavorite(stock: StockIdentifier) async throws {
         guard !favorites.contains(stock) else { return }

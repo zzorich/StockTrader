@@ -10,9 +10,9 @@ import Alamofire
 import Combine
 
 let requestHeader = "https://durable-melody-413101.nn.r.appspot.com/search/autocomplete"
-struct SearchResponse: POD {
+struct AutoSuggestionsResponse: POD {
     let searchKeyword: String?
-    let searchResults: [String]
+    let searchResults: [SearchItem]
 
     enum CodingKeys: String, CodingKey {
         case searchKeyword = "search_keyword"
@@ -20,57 +20,59 @@ struct SearchResponse: POD {
     }
 }
 
-struct SearchRequest: POD {
-    let searchKeyword: String
+struct SearchItem: POD {
+    let companySymbol: String
+    let companyDescription: String
+
+    enum CodingKeys: String, CodingKey {
+        case companySymbol = "symbol"
+        case companyDescription = "description"
+    }
 }
 
-
-@Observable
-@MainActor
-class SearchViewModel {
-    var searchKeyword: String = "" {
-        didSet {
-            searchQueryPublisher.send(searchKeyword)
-        }
+class SearchViewModel: ObservableObject {
+    enum LoadingState {
+        case isLoading
+        case failed(error: any Error)
+        case success([SearchItem])
     }
-    private var searchTask: DataTask<SearchResponse>?
-    private var searchQueryPublisher = PassthroughSubject<String, Never>()
+    @Published var searchKeyWord: String = ""
     private var cancellables = Set<AnyCancellable>()
-    var searchItems: [String] = []
+    private var searchTask: Task<(), Never>?
+    @Published var state: LoadingState = .isLoading
 
     init() {
-        searchQueryPublisher
-            .debounce(for: .seconds(0.005), scheduler: RunLoop.main)
-                    .removeDuplicates()
-                    .sink { [weak self] query in
-                        if !query.isEmpty {
-                            self?.search(with: query)
-                        }
-                    }
-                    .store(in: &cancellables)
+        $searchKeyWord.debounce(for: 0.02, scheduler: RunLoop.main)
+            .sink { [weak self] value in
+                guard let self, value == searchKeyWord else { return }
+                search(with: searchKeyWord)
+            }
+            .store(in: &cancellables)
     }
 
     func search(with query: String) {
-        searchTask?.cancel()
-        searchTask = AF.request(requestHeader, method: .get, parameters: ["search_keyword": query])
-            .serializingDecodable(SearchResponse.self, automaticallyCancelling: true)
+        state = .isLoading
+        guard !query.isEmpty else {
+            state = .success([])
+            return
+        }
 
-        searchTask?.resume()
-        Task(priority: .high) {
-            try await fetchSearchResults(query: query)
+        searchTask = Task { @MainActor in
+            let response =  await AF.request(requestHeader, method: .get, parameters: ["search_keyword": query])
+                .serializingDecodable(AutoSuggestionsResponse.self, automaticallyCancelling: true)
+                .response.map { response in
+                    response.searchResults
+                }
+
+            guard query == searchKeyWord else { return }
+            switch response.result {
+            case .failure(let error):
+                state = .failed(error: error)
+            case .success(let items):
+                state = .success(items)
+            }
         }
     }
 
-    func fetchSearchResults(query: String) async throws {
-        guard let response = await searchTask?.response else { return }
-        guard query == searchKeyword else { return }
-        switch response.result {
-        case .success(let response):
-            self.searchItems = response.searchResults
-        case .failure(let error):
-            debugPrint(error)
-            throw error
-        }
-    }
 }
 
