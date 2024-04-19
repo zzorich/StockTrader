@@ -98,6 +98,15 @@ extension PortfolioViewModel {
 
     func quote(of stock: StockIdentifier) -> StockQuote? { allStocks[stock] }
 
+
+
+    func fetchQuote(of stock: StockIdentifier) async throws -> StockQuote {
+        return .test
+    }
+}
+
+@MainActor
+extension PortfolioViewModel {
     static let test: PortfolioViewModel = {
         let model = PortfolioViewModel()
         model.stocksOwned.append(.init(id: .test))
@@ -109,8 +118,4 @@ extension PortfolioViewModel {
         model.allStocks[test2] = .test
         return model
     }()
-
-    func fetchQuote(of stock: StockIdentifier) async throws -> StockQuote {
-        return .test
-    }
 }

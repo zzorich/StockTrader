@@ -10,6 +10,7 @@ import SwiftUI
 @main
 @MainActor
 struct StockMarketApp: App {
+
     private var portfolio = PortfolioViewModel.test
     var body: some Scene {
         WindowGroup {
