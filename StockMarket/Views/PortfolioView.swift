@@ -11,7 +11,8 @@ import SwiftUI
 struct PortfolioView: View {
     @Environment(PortfolioViewModel.self) private var portfolio
     @Environment(\.isSearching) private var isSearching
-    @State private var isShowingErrorToast: (Bool, (any Error)?) = (false, nil)
+    @State private var isShowingErrorToast: Bool = false
+    @State private var errorMessage: String = "Failed to load search result"
 
     @EnvironmentObject private var searchViewModel: SearchViewModel
 
@@ -25,10 +26,10 @@ struct PortfolioView: View {
                     EmptyView()
                         .onAppear(perform: {
                             withAnimation {
-                                isShowingErrorToast = (true, error)
+                                isShowingErrorToast = true
                             } completion: {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    isShowingErrorToast = (false, nil)
+                                    isShowingErrorToast = false
                                 }
                             }
                         })
@@ -65,7 +66,7 @@ struct PortfolioView: View {
         .toolbar(content: {
             EditButton()
         })
-        .errorToasted(isShowingToast: $isShowingErrorToast)
+        .toasted(isShowingToast: $isShowingErrorToast, message: errorMessage)
     }
 
     var assetsHeader: some View {

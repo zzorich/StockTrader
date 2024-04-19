@@ -10,7 +10,7 @@ import WebKit
 
 struct WebView: UIViewRepresentable {
 
-    var url: URL?
+    let url: URL?
 
     func makeUIView(context: Context) -> WKWebView {
         return WKWebView()
@@ -22,7 +22,6 @@ struct WebView: UIViewRepresentable {
         uiView.load(request)
     }
 }
-
 
 #Preview {
     WebView(url: URL(string: "https://durable-melody-413101.nn.r.appspot.com/charts/hourly-price/AAPL"))

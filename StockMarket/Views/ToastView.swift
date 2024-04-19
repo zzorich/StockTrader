@@ -7,15 +7,16 @@
 
 import SwiftUI
 
-struct ErrorToast: ViewModifier {
-    @Binding var isShowingToast: (Bool, (any Error)?)
+struct Toast: ViewModifier {
+    @Binding var isShowingToast: Bool
+    let message: String
     let animated: Bool = true
 
     func body(content: Content) -> some View {
         ZStack {
             content
-            if case (true, .some(let error)) = isShowingToast {
-                ToastView(message: error.localizedDescription)
+            if isShowingToast {
+                ToastView(message: message)
                     .transition(.move(edge: .top).combined(with: .opacity))
                                         .zIndex(1)
             }
@@ -25,8 +26,8 @@ struct ErrorToast: ViewModifier {
 }
 
 extension View {
-    func errorToasted(isShowingToast: Binding<(Bool, (any Error)?)>) -> some View {
-        self.modifier(ErrorToast(isShowingToast: isShowingToast))
+    func toasted(isShowingToast: Binding<Bool>, message: String) -> some View {
+        self.modifier(Toast(isShowingToast: isShowingToast, message: message))
     }
 }
 

@@ -9,7 +9,10 @@ import Foundation
 import SwiftUI
 
 struct DetailedStockInfoView: View {
-    let stockIdentifier: String
+    let detailStockInfoViewModel: DetailedStockInfoViewModel
+    init(stockIdentifier: String) {
+        detailStockInfoViewModel = .init(stockSymbol: stockIdentifier)
+    }
 
     var body: some View {
         List {

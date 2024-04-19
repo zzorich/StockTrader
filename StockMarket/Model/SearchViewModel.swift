@@ -9,7 +9,8 @@ import Foundation
 import Alamofire
 import Combine
 
-let requestHeader = "https://durable-melody-413101.nn.r.appspot.com/search/autocomplete"
+private let requestHeader = "https://durable-melody-413101.nn.r.appspot.com/search/autocomplete"
+
 struct AutoSuggestionsResponse: POD {
     let searchKeyword: String?
     let searchResults: [SearchItem]
