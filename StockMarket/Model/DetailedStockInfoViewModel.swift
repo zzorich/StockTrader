@@ -24,7 +24,7 @@ class DetailedStockInfoViewModel {
 
     init(stockSymbol: String) {
         task = Task { @MainActor in
-            let response = await AF.request(requestHeader, method: .get, parameters: ["symbol": "AAPL"])
+            let response = await AF.request(requestHeader, method: .get, parameters: ["symbol": stockSymbol])
                 .serializingDecodable(StockInfo.self, automaticallyCancelling: true)
                 .response
 
@@ -141,7 +141,7 @@ extension DetailedStockInfoViewModel {
         let industry: String
         let webpageLink: URL
         let companyPeersSymbols: [String]
-        
+
         enum CodingKeys: String, CodingKey {
             case ipoStartDate = "ipo_start_date"
             case industry = "industry"

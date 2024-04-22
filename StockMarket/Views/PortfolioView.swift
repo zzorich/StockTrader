@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@MainActor
 struct PortfolioView: View {
     @Environment(PortfolioViewModel.self) private var portfolio
     @Environment(\.isSearching) private var isSearching
