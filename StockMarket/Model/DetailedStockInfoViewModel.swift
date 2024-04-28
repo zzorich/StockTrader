@@ -70,13 +70,15 @@ extension DetailedStockInfoViewModel {
         let currentPrice: Double
         let changePrice: Double
         let changePercent: Double
-        
+        let isMarketOpen: Bool
+
         enum CodingKeys: String, CodingKey {
             case stockSymbol = "symbol"
             case companyName = "company_name"
             case currentPrice = "current_price"
             case changePrice = "change_price"
             case changePercent = "change_percent"
+            case isMarketOpen = "is_market_open"
         }
     }
     
@@ -125,7 +127,8 @@ extension DetailedStockInfoViewModel {
         let totalChange: Double
         let positiveChange: Double
         let negativeChange: Double
-        
+        let companyName: String
+
         enum CodingKeys: String, CodingKey {
             case totalMSPR = "total_mspr"
             case positiveMSPR = "positive_mspr"
@@ -133,6 +136,7 @@ extension DetailedStockInfoViewModel {
             case totalChange = "total_change"
             case positiveChange = "positive_change"
             case negativeChange = "negative_change"
+            case companyName = "company_name"
         }
     }
     
@@ -166,15 +170,14 @@ extension DetailedStockInfoViewModel {
     
     struct New: POD, Identifiable {
         let id: Int
-        let datetime: Date
+        let datetime: Int
         let headline: String
         let imageUrl: URL?
         let related: String
         let source: String
         let summary: String
         let link: URL
-        
-        
+
         enum CodingKeys: String, CodingKey {
             case id
             case datetime
@@ -185,6 +188,11 @@ extension DetailedStockInfoViewModel {
             case summary
             case link = "url"
         }
+
+        var date: Date {
+            .init(timeIntervalSince1970: TimeInterval(datetime))
+        }
+
     }
 }
 
@@ -193,7 +201,16 @@ extension DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.timeZone = .current
         return formatter
     }()
+}
+
+extension Date {
+    var timeIntervalSinceNowDescription: String {
+        let seconds = -timeIntervalSinceNow
+        let hours = Int(seconds) / 3600
+        let minutes = Int(seconds) % 3600 / 60
+        return "\(hours) hr, \(minutes) min"
+    }
 }

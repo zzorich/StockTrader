@@ -8,12 +8,10 @@
 import Foundation
 import SwiftUI
 
-
-
-
 typealias VM = DetailedStockInfoViewModel
 struct DetailedStockInfoContainer: View {
     private let detailStockInfoViewModel: DetailedStockInfoViewModel
+
     init(stockIdentifier: String) {
         detailStockInfoViewModel = .init(stockSymbol: stockIdentifier)
     }
@@ -31,39 +29,75 @@ struct DetailedStockInfoContainer: View {
 }
 
 struct DetailStockInfoView: View {
+    @State private var tappedNew: VM.New? = nil
     let stockInfo: VM.StockInfo
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading) {
+            LazyVStack(alignment: .leading, spacing: 10) {
                 BasicInfoHeader(info: stockInfo.basicInfo)
                 Color.clear
                     .frame(minHeight: 400)
                     .overlay {
                         TabCharts(stockInfo: stockInfo)
                     }
-                Spacer(minLength: 20)
                 HStack {
                     PortfolioSection(stockInfo: stockInfo)
                     Spacer()
-                    Button {
-
-                    } label: {
-                        ZStack {
-                            Capsule(style: .continuous)
-                                .fill(Color.green)
-                            Text("Trade")
-                                .foregroundStyle(.white)
+                    if stockInfo.basicInfo.isMarketOpen {
+                        Button {
+                            
+                        } label: {
+                            ZStack {
+                                Capsule(style: .continuous)
+                                    .fill(Color.green)
+                                Text("Trade")
+                                    .foregroundStyle(.white)
+                            }
+                            .frame(maxWidth: 150)
+                            .frame(height: 60)
                         }
-                        .frame(maxWidth: 150)
-                        .frame(height: 60)
                     }
                 }
 
-                Spacer(minLength: 20)
+
+
                 StatsSection(stats: stockInfo.stats)
 
-                Spacer(minLength: 20)
                 AboutSection(aboutInfo: stockInfo.about)
+
+                InsightsSection(insights: stockInfo.insights)
+
+                WebView(url: stockInfo.charts.recommendationChart)
+                    .frame(minHeight: 400)
+
+                WebView(url: stockInfo.charts.historicalEpsChart)
+                    .frame(minHeight: 400)
+
+                Text("News")
+                    .bold()
+                if let firstNew = stockInfo.news.first, let imageURL = firstNew.imageUrl {
+                    VStack(alignment: .leading) {
+                        AsyncImage(url: imageURL) { image in
+                            image.resizable()
+                                .scaledToFit()
+                                .clipShape(RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/))
+                        } placeholder: {
+                            ProgressView("loading")
+                        }
+                        NewCellView(new: firstNew)
+                    }
+                    .onTapGesture {
+                        tappedNew = firstNew
+                    }
+                }
+                Divider()
+
+                ForEach(stockInfo.news.dropFirst()) { new in
+                    NewCellView(new: new)
+                        .onTapGesture {
+                            tappedNew = new
+                        }
+                }
             }
             .padding([.leading, .trailing])
 
@@ -73,6 +107,10 @@ struct DetailStockInfoView: View {
 
             }
         })
+        .sheet(item: $tappedNew) { new in
+            NewDetailView(new: new)
+        }
+
     }
 }
 
@@ -138,23 +176,68 @@ private struct StatsSection: View {
     }
 }
 
-
 private struct InsightsSection: View {
     let insights: VM.Insights
 
     var body: some View {
-        Grid {
+        Grid(verticalSpacing: 10) {
             GridRow {
+                Text("Insights")
+                    .gridCellColumns(3)
+                    .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, alignment: .leading)
+            }
+
+            GridRow {
+                Text("Insider Sentiments")
+                    .gridCellColumns(3)
+            }
+
+            GridRow {
+                Text(insights.companyName)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text("MSPR")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text("Change")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .bold()
+
+            GridRow {
+                Text("Total")
+                    .bold()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text((insights.positiveMSPR+insights.negativeChange).currencyFormated)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Text((insights.positiveChange+insights.negativeChange).currencyFormated)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
             }
 
             GridRow {
+                Text("Positive")
+                    .bold()
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
+                Text(insights.positiveMSPR.currencyFormated)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(insights.positiveChange.currencyFormated)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            GridRow {
+                Text("Negative")
+                    .bold()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Text(insights.negativeChange.currencyFormated)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(insights.negativeChange.currencyFormated)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
 }
-
 
 private struct AboutSection: View {
     let aboutInfo: VM.AboutInfo
@@ -198,6 +281,20 @@ private struct AboutSection: View {
     }
 }
 
+private struct NewCellView: View {
+    let new: VM.New
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("\(new.source),  \(new.date.timeIntervalSinceNowDescription)")
+                .font(.footnote)
+                .foregroundStyle(.gray)
+            Text(new.headline)
+                .font(.headline)
+            Text("")
+        }
+    }
+}
 
 private struct PortfolioSection: View {
     let stockInfo: DetailedStockInfoViewModel.StockInfo
