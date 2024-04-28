@@ -16,11 +16,11 @@ struct ContentView: View {
                 .environmentObject(searchViewModel)        
                 .environment(router)
                 .navigationDestination(for: SearchItem.self) { searchItem in
-                    DetailedStockInfoView(stockIdentifier: searchItem.companySymbol)
+                    DetailedStockInfoContainer(stockIdentifier: searchItem.companySymbol)
                         .navigationBarTitleDisplayMode(.inline)
                 }
                 .navigationDestination(for: DetailStockItem.self) { item in
-                    DetailedStockInfoView(stockIdentifier: item.symbol)
+                    DetailedStockInfoContainer(stockIdentifier: item.symbol)
                         .navigationBarTitleDisplayMode(.inline)
                 }
         }
