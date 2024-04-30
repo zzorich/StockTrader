@@ -7,30 +7,15 @@
 
 import SwiftUI
 
-struct PortfolioView: View {
+struct PortfolioLoadedView: View {
     @Environment(PortfolioViewModel.self) private var portfolio
+    @EnvironmentObject private var searchViewModel: SearchViewModel
+
     @Environment(\.isSearching) private var isSearching
     @State private var isShowingErrorToast: Bool = false
     @State private var errorMessage: String = "Failed to load search result"
 
-    @EnvironmentObject private var searchViewModel: SearchViewModel
-
     var body: some View {
-        switch portfolio.loadingState {
-        case .loaded:
-            loadedBody
-                .searchable(text: $searchViewModel.searchKeyWord)
-                .onAppear(perform: {
-                    portfolio.reloadDataIfNeeded()
-                })
-        case .failed(error: let error):
-            Text(error.localizedDescription)
-        case .isLoading:
-            ProgressView()
-        }
-    }
-
-    var loadedBody: some View {
         List {
             if isSearching {
                 switch searchViewModel.state {
@@ -57,16 +42,14 @@ struct PortfolioView: View {
                     Text(Date.now.formatted(.dateTime))
                         .font(.largeTitle)
                 }
+                
                 if !portfolio.stocksOwned.isEmpty {
                     Section("PORTFOLIO") {
-                        VStack {
-                            assetsHeader
-                            Divider()
-                            ForEach(portfolio.stocksOwned.keys.sorted(by: <)) { stock in
-                                if let stockQuote = portfolio.quote(of: stock), let ownedInfo = portfolio.stocksOwned[stock] {
-                                    NavigationLink(value: DetailStockItem(symbol: stock.symbol)) {
-                                        OwnedStockInfoView(stock: ownedInfo, stockQuote: stockQuote)
-                                    }
+                        assetsHeader
+                        ForEach(portfolio.stocksOwned.keys.sorted(by: <)) { stock in
+                            if let stockQuote = portfolio.quote(of: stock), let ownedInfo = portfolio.stocksOwned[stock] {
+                                NavigationLink(value: DetailStockItem(symbol: stock.symbol)) {
+                                    OwnedStockInfoView(stock: ownedInfo, stockQuote: stockQuote)
                                 }
                             }
                         }
@@ -86,6 +69,7 @@ struct PortfolioView: View {
                         .onDelete(perform: portfolio.removeFavoriteStocks(at:))
                         .onMove(perform: portfolio.removeFavorites(from:to:))
                     }
+
                 }
             }
         }
@@ -110,4 +94,25 @@ struct PortfolioView: View {
             }
         }
     }
+}
+
+struct PortfolioView: View {
+    @Environment(PortfolioViewModel.self) private var portfolio
+    @EnvironmentObject private var searchViewModel: SearchViewModel
+
+    var body: some View {
+        switch portfolio.loadingState {
+        case .loaded:
+            PortfolioLoadedView()
+                .searchable(text: $searchViewModel.searchKeyWord)
+                .onAppear(perform: {
+                    portfolio.reloadDataIfNeeded()
+                })
+        case .failed(error: let error):
+            Text(error.localizedDescription)
+        case .isLoading:
+            ProgressView()
+        }
+    }
+
 }
