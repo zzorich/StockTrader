@@ -42,7 +42,7 @@ struct PortfolioLoadedView: View {
                     Text(Date.now.formatted(.dateTime))
                         .font(.largeTitle)
                 }
-                
+
                 if !portfolio.stocksOwned.isEmpty {
                     Section("PORTFOLIO") {
                         assetsHeader
@@ -69,7 +69,6 @@ struct PortfolioLoadedView: View {
                         .onDelete(perform: portfolio.removeFavoriteStocks(at:))
                         .onMove(perform: portfolio.removeFavorites(from:to:))
                     }
-
                 }
             }
         }

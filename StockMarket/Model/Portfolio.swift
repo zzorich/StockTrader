@@ -46,11 +46,9 @@ struct InitialData: POD {
     }
     struct Favorite: POD {
         let stockSymbol: String
-        let companyName: String
 
         enum CodingKeys: String, CodingKey {
-            case stockSymbol = "ticker"
-            case companyName = "company"
+            case stockSymbol = "symbol"
         }
     }
     struct OwnedStock: POD {
@@ -242,13 +240,14 @@ extension PortfolioViewModel {
     struct PlainData: POD {
         let symbol: String
     }
-    func addFavorite(stock: StockIdentifier) {
-        Task {
 
-            guard let data = try? JSONEncoder().encode(PlainData(symbol: stock.symbol)) else { return }
+
+    func addFavorite(stockSymbol: String) {
+        Task {
+            guard let data = try? JSONEncoder().encode(PlainData(symbol: stockSymbol)) else { return }
             guard let code = await AF.request(addFavoriteURL!, method: .post, parameters: data, encoder: JSONParameterEncoder.default).serializingData().response.response?.statusCode else { return }
 
-            if code == 200 {
+            if code != 200 {
                 isDataDirty = true
             }
         }

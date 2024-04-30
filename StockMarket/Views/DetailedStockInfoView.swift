@@ -29,6 +29,7 @@ struct DetailedStockInfoContainer: View {
 }
 
 struct DetailStockInfoView: View {
+    @Environment(PortfolioViewModel.self) private var vm
     @State private var tappedNew: VM.New? = nil
     let stockInfo: VM.StockInfo
     var body: some View {
@@ -58,8 +59,6 @@ struct DetailStockInfoView: View {
                         }
                     }
                 }
-
-
 
                 StatsSection(stats: stockInfo.stats)
 
@@ -103,14 +102,17 @@ struct DetailStockInfoView: View {
 
         }
         .toolbar(content: {
-            Button("Add to faveroites", systemImage: "plus.circle.fill") {
-
+            let canAdd = !vm.favorites.map({$0.stockSymbol}).contains(stockInfo.basicInfo.stockSymbol)
+            Button("Add to faveroites", systemImage: canAdd ? "plus.circle" : "plus.circle.fill") {
+                guard canAdd else { return }
+                Task {
+                    vm.addFavorite(stockSymbol: stockInfo.basicInfo.stockSymbol)
+                }
             }
         })
         .sheet(item: $tappedNew) { new in
             NewDetailView(new: new)
         }
-
     }
 }
 
