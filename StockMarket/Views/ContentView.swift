@@ -9,12 +9,11 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var searchViewModel = SearchViewModel()
-    @Bindable private var router: Router = .init()
+    @StateObject private var router: Router = .init()
     var body: some View {
         NavigationStack(path: $router.path) {
             PortfolioView()
                 .environmentObject(searchViewModel)        
-                .environment(router)
                 .navigationDestination(for: SearchItem.self) { searchItem in
                     DetailedStockInfoContainer(stockIdentifier: searchItem.companySymbol)
                         .navigationBarTitleDisplayMode(.inline)
@@ -24,6 +23,7 @@ struct ContentView: View {
                         .navigationBarTitleDisplayMode(.inline)
                 }
         }
+        .environmentObject(router)
 
     }
 }

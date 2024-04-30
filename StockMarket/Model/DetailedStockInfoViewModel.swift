@@ -64,7 +64,8 @@ extension DetailedStockInfoViewModel {
 }
 
 extension DetailedStockInfoViewModel {
-    struct BasicInfo: POD {
+    struct BasicInfo: POD, Identifiable {
+        var id: String { stockSymbol }
         let stockSymbol: String
         let companyName: String
         let currentPrice: Double

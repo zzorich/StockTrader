@@ -31,6 +31,11 @@ struct DetailedStockInfoContainer: View {
 struct DetailStockInfoView: View {
     @Environment(PortfolioViewModel.self) private var vm
     @State private var tappedNew: VM.New? = nil
+    @State private var isShowingAddFavoriteToast = false
+    @State private var addFavoriteMessage: String = ""
+
+    @State private var tradingInfo: VM.BasicInfo? = nil
+
     let stockInfo: VM.StockInfo
     var body: some View {
         ScrollView {
@@ -46,7 +51,7 @@ struct DetailStockInfoView: View {
                     Spacer()
                     if stockInfo.basicInfo.isMarketOpen {
                         Button {
-                            
+                            tradingInfo = stockInfo.basicInfo
                         } label: {
                             ZStack {
                                 Capsule(style: .continuous)
@@ -102,17 +107,31 @@ struct DetailStockInfoView: View {
 
         }
         .toolbar(content: {
-            let canAdd = !vm.favorites.map({$0.stockSymbol}).contains(stockInfo.basicInfo.stockSymbol)
+            let symbol = stockInfo.basicInfo.stockSymbol
+            let canAdd = !vm.favorites.map({$0.stockSymbol}).contains(symbol)
             Button("Add to faveroites", systemImage: canAdd ? "plus.circle" : "plus.circle.fill") {
                 guard canAdd else { return }
+                withAnimation {
+                    addFavoriteMessage = "Adding \(symbol) to favorites"
+                    isShowingAddFavoriteToast = true
+                }
                 Task {
-                    vm.addFavorite(stockSymbol: stockInfo.basicInfo.stockSymbol)
+                    let isAdded = await vm.addFavorite(stockSymbol: symbol)
+                    DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                        withAnimation {
+                            isShowingAddFavoriteToast = false
+                        }
+                    }
                 }
             }
         })
         .sheet(item: $tappedNew) { new in
             NewDetailView(new: new)
         }
+        .sheet(item: $tradingInfo, content: { tradeInfo in
+            TradingView(stockInfo: tradeInfo)
+        })
+        .toasted(isShowingToast: $isShowingAddFavoriteToast, message: addFavoriteMessage)
     }
 }
 
@@ -132,7 +151,6 @@ private struct BasicInfoHeader: View {
                     .font(.title2)
                 PriceChangeLabel(changeInPrice: info.changePrice, changeInPercent: info.changePercent)
             }
-
         }
     }
 }
@@ -300,22 +318,23 @@ private struct NewCellView: View {
 
 private struct PortfolioSection: View {
     let stockInfo: DetailedStockInfoViewModel.StockInfo
+    @Environment(PortfolioViewModel.self) private var vm
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Portfolio").bold()
                 .font(.title2)
-            if let portfolio = stockInfo.portfolio {
+            if let portfolio = vm.stocksOwned.first(where: {$0.stockSymbol == stockInfo.basicInfo.stockSymbol}) {
 
-                let marketValue = stockInfo.basicInfo.currentPrice * Double(portfolio.sharedOwned)
-                let totalCost = portfolio.averageCost * Double(portfolio.sharedOwned)
+                let marketValue = stockInfo.basicInfo.currentPrice * Double(portfolio.quantity)
+                let totalCost = portfolio.cost * Double(portfolio.quantity)
                 let change = totalCost - marketValue
 
                 Text("Shares Owned:  ").bold()
-                + Text("\(portfolio.sharedOwned)")
+                + Text("\(portfolio.quantity)")
 
                 Text("Avg Cost/Share:  ").bold()
-                + Text("\(portfolio.averageCost.currencyFormated)")
+                + Text("\(portfolio.cost.currencyFormated)")
 
                 Text("Total Cost:  ").bold()
                 + Text("\((totalCost).currencyFormated)")

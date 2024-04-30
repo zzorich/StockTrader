@@ -11,8 +11,6 @@ import SwiftUI
 struct DetailStockItem: Hashable {
     let symbol: String
 }
-@Observable
-class Router {
-    var path: NavigationPath = .init()
-
+class Router: ObservableObject {
+    @Published var path: NavigationPath = .init()
 }

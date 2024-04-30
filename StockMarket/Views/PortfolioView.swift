@@ -39,20 +39,24 @@ struct PortfolioLoadedView: View {
 
             } else {
                 Section {
-                    Text(Date.now.formatted(.dateTime))
+                    Text(Date.now.formatted(.dateTime.day().month(.wide).year()))
+                        .foregroundStyle(.secondary)
                         .font(.largeTitle)
                 }
 
                 if !portfolio.stocksOwned.isEmpty {
                     Section("PORTFOLIO") {
                         assetsHeader
-                        ForEach(portfolio.stocksOwned.keys.sorted(by: <)) { stock in
-                            if let stockQuote = portfolio.quote(of: stock), let ownedInfo = portfolio.stocksOwned[stock] {
-                                NavigationLink(value: DetailStockItem(symbol: stock.symbol)) {
-                                    OwnedStockInfoView(stock: ownedInfo, stockQuote: stockQuote)
+                        ForEach(portfolio.stocksOwned, id: \.stockSymbol) { ownedStockInfo in
+                            if let stockQuote = portfolio.quote(of: ownedStockInfo.stockSymbol) {
+                                NavigationLink(value: DetailStockItem(symbol: ownedStockInfo.stockSymbol)) {
+                                    OwnedStockInfoView(stock: ownedStockInfo, stockQuote: stockQuote)
                                 }
                             }
                         }
+                        .onMove(perform: { indices, newOffset in
+                            portfolio.stocksOwned.move(fromOffsets: indices, toOffset: newOffset)
+                        })
                     }
                 }
 
@@ -67,7 +71,9 @@ struct PortfolioLoadedView: View {
                             }
                         }
                         .onDelete(perform: portfolio.removeFavoriteStocks(at:))
-                        .onMove(perform: portfolio.removeFavorites(from:to:))
+                        .onMove(perform: { indices, newOffset in
+                            portfolio.favorites.move(fromOffsets: indices, toOffset: newOffset)
+                        })
                     }
                 }
             }

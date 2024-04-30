@@ -51,11 +51,12 @@ struct InitialData: POD {
             case stockSymbol = "symbol"
         }
     }
+
     struct OwnedStock: POD {
         let stockSymbol: String
         let companyName: String
         let cost: Double
-        let quantity: Int
+        var quantity: Int
 
         enum CodingKeys: String, CodingKey {
             case stockSymbol = "ticker"
@@ -89,9 +90,6 @@ struct StockIdentifier: Identifiable, Hashable, Equatable, Comparable {
     
     let symbol: String
     var id: String { symbol }
-    static let test: Self = .init(symbol: "test")
-
-
 }
 
 @Observable
@@ -111,19 +109,22 @@ class PortfolioViewModel {
     @MainActor var isDataDirty = false {
         didSet {
             if isDataDirty {
-                fetchIntialData()
+                Task {
+                    try? await Task.sleep(nanoseconds: 1000000)
+                    fetchIntialData()
+                }
             }
         }
     }
 
     @ObservationIgnored private var allStocks: [StockIdentifier: StockQuote] = [:]
-    @MainActor private(set) var stocksOwned: [StockIdentifier: InitialData.OwnedStock] = [:]
-    @MainActor private(set) var favorites: [InitialData.Favorite] = []
+    @MainActor var stocksOwned: [InitialData.OwnedStock] = []
+    @MainActor var favorites: [InitialData.Favorite] = []
     @MainActor var cashBalance: Double = 25000
     @MainActor var netWorth: Double {
         stocksOwned.reduce(into: cashBalance) { partialResult, stock in
-            guard let quote = quote(of: stock.key) else { return }
-            partialResult += quote.currentPrice * Double(stock.value.quantity)
+            guard let quote = quote(of: stock.stockSymbol) else { return }
+            partialResult += quote.currentPrice * Double(stock.quantity)
         }
     }
 
@@ -192,7 +193,7 @@ extension PortfolioViewModel {
                 mainInfo = _mainInfo
             case .failure(let failure):
                 loadingState = .failed(error: failure)
-                debugPrint(String(data: response.data ?? Data(), encoding: .utf8))
+                debugPrint(String(data: response.data ?? Data(), encoding: .utf8) ?? "")
             }
 
             guard let mainInfo else { return }
@@ -222,10 +223,7 @@ extension PortfolioViewModel {
                     }
 
                     self.favorites = mainInfo.favorite
-                    self.stocksOwned = mainInfo.ownedStock.reduce(into: .init(), { partialResult, stock in
-                        let id = StockIdentifier(symbol: stock.stockSymbol)
-                        partialResult[id] = stock
-                    })
+                    self.stocksOwned = mainInfo.ownedStock
 
                     cashBalance = mainInfo.user.balance
                 }
@@ -242,21 +240,20 @@ extension PortfolioViewModel {
     }
 
 
-    func addFavorite(stockSymbol: String) {
-        Task {
-            guard let data = try? JSONEncoder().encode(PlainData(symbol: stockSymbol)) else { return }
-            guard let code = await AF.request(addFavoriteURL!, method: .post, parameters: data, encoder: JSONParameterEncoder.default).serializingData().response.response?.statusCode else { return }
+    func addFavorite(stockSymbol: String) async -> Bool {
+        guard let code = await AF.request(addFavoriteURL!, method: .post, parameters: ["symbol": stockSymbol], encoder: JSONParameterEncoder.default).serializingData().response.response?.statusCode else { return false }
 
-            if code != 200 {
-                isDataDirty = true
-            }
+        if code == 200 {
+            isDataDirty = true
+            return true
+        } else {
+            return false
         }
     }
 
-    func postRemoveFavorite(stock: StockIdentifier) {
+    func postRemoveFavorite(stockSymbol: String) {
         Task {
-            guard let data = try? JSONEncoder().encode(PlainData(symbol: stock.symbol)) else { return }
-            guard let code = await AF.request(removeFavoriteURL!, method: .post, parameters: data, encoder: JSONParameterEncoder.default).serializingData().response.response?.statusCode else { return }
+            guard let code = await AF.request(removeFavoriteURL!, method: .post, parameters: ["symbol": stockSymbol], encoder: JSONParameterEncoder.default).serializingData().response.response?.statusCode else { return }
 
             if code != 200 {
                 isDataDirty = true
@@ -265,7 +262,6 @@ extension PortfolioViewModel {
     }
 
     func removeFavoriteStocks(at indexSet: IndexSet) {
-        favorites.remove(atOffsets: indexSet)
 
         indexSet
             .map { index in
@@ -274,77 +270,77 @@ extension PortfolioViewModel {
             .map { favorite in
                 favorite.stockSymbol
             }
-            .map(StockIdentifier.init(symbol: ))
-            .forEach(postRemoveFavorite(stock:))
+            .forEach(postRemoveFavorite(stockSymbol:))
+        favorites.remove(atOffsets: indexSet)
     }
 
-    func removeFavorites(from oldIndexSet: IndexSet, to newIndex: Int) {
-        favorites.move(fromOffsets: oldIndexSet, toOffset: newIndex)
-    }
-
+    @inlinable
     func quote(of stock: StockIdentifier) -> StockQuote? { allStocks[stock] }
 
+    func quote(of stockSymbol: String) -> StockQuote? {
+        let id = StockIdentifier(symbol: stockSymbol)
+        return quote(of: id)
+    }
 
 
     func canBuy(stockPrice: Double, numberOfShares: Int) -> Bool {
         numberOfShares > 0 && Double(numberOfShares) * stockPrice <= cashBalance
-
     }
 
-    func buy(stock: String, stockPrice: Double, numberOfShares: Int, companyName: String) {
-        guard canBuy(stockPrice: stockPrice, numberOfShares: numberOfShares) else { return }
-        cashBalance -= Double(numberOfShares) * stockPrice
-        assert(cashBalance >= 0)
 
-        let info = InitialData.OwnedStock(stockSymbol: stock, companyName: companyName, cost: stockPrice, quantity: numberOfShares)
-        guard let data = try? JSONEncoder().encode(info) else { return }
+    struct BuyStockResponse: POD {
+        let quote: StockQuote
+        let portfolio: InitialData.OwnedStock
+    }
 
-        Task(priority: .high) {
-            let response = await AF.request(buyURL!, method: .post,
-                                                        parameters: data,
-                                                        encoder: JSONParameterEncoder.default).serializingData().response
-            switch response.result {
-            case.success(_):
-                isDataDirty = true
-            case .failure(let error):
-                return
+    func buy(stockSymbol: String, stockPrice: Double, numberOfShares: Int, companyName: String) async -> Bool {
+        guard canBuy(stockPrice: stockPrice, numberOfShares: numberOfShares) else { return false }
+        let info = InitialData.OwnedStock(stockSymbol: stockSymbol, companyName: companyName, cost: stockPrice, quantity: numberOfShares)
+
+        let response = await AF.request(buyURL!, method: .post,
+                                        parameters: info, encoder: JSONParameterEncoder.default).serializingDecodable(BuyStockResponse.self, automaticallyCancelling: true).response
+        switch response.result {
+        case.success(let buyStockResponse):
+            let id = StockIdentifier(symbol: stockSymbol)
+            allStocks[id] = buyStockResponse.quote
+            if let index = stocksOwned.firstIndex(where: {$0.stockSymbol == stockSymbol}) {
+                stocksOwned[index] = buyStockResponse.portfolio
+            } else {
+                stocksOwned.append(buyStockResponse.portfolio)
             }
+            return true
+        case .failure(_):
+            debugPrint(String(data: response.data ?? Data(), encoding: .utf8) ?? "")
+            return false
         }
     }
 
     func canSell(stock: String, numberOfShares: Int) -> Bool {
-        let id = StockIdentifier(symbol: stock)
-        if let quantity = stocksOwned[id]?.quantity, quantity >= numberOfShares {
+        if let quantity = stocksOwned.first(where: {$0.stockSymbol == stock})?.quantity, quantity >= numberOfShares {
             return true
         } else {
             return false
         }
     }
 
-    func sell(stock: String, stockPrice: Double, numberOfShares: Int, companyName: String) {
-        guard canBuy(stockPrice: stockPrice, numberOfShares: numberOfShares) else { return }
-        cashBalance += Double(numberOfShares) * stockPrice
-        assert(cashBalance >= 0)
+    func sell(stock: String, stockPrice: Double, numberOfShares: Int, companyName: String) async -> Bool {
+        guard canSell(stock: stock, numberOfShares: numberOfShares) else { return false }
+        guard let index = stocksOwned.firstIndex(where: {$0.stockSymbol == stock}) else { return false }
 
         let info = InitialData.OwnedStock(stockSymbol: stock, companyName: companyName, cost: stockPrice, quantity: numberOfShares)
-        guard let data = try? JSONEncoder().encode(info) else { return }
 
-        Task(priority: .high) {
-            let response = await AF.request(buyURL!, method: .post,
-                                                        parameters: data,
-                                                        encoder: JSONParameterEncoder.default).serializingData().response
+        let response = await AF.request(sellURL!, method: .post,
+                                        parameters: info, encoder: JSONParameterEncoder.default).serializingData().response
 
-            switch response.result {
-            case.success(_):
-                isDataDirty = true
-            case .failure(let error):
-                return
-            }
+        switch response.result {
+        case.success(_):
+            cashBalance += Double(numberOfShares) * stockPrice
+            stocksOwned[index].quantity -= numberOfShares
+            if stocksOwned[index].quantity == 0 { stocksOwned.remove(at: index) }
+            return true
+        case .failure(_):
+            debugPrint(String(data: response.data ?? Data(), encoding: .utf8) ?? "")
+            return false
         }
     }
-}
-
-@MainActor
-extension PortfolioViewModel {
-
 }

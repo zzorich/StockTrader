@@ -17,8 +17,9 @@ struct Toast: ViewModifier {
             content
             if isShowingToast {
                 ToastView(message: message)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                                        .zIndex(1)
+                    .transition(.opacity)
+                    .zIndex(1)
+                    .frame(maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, alignment: .bottom)
             }
         }
     }

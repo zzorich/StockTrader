@@ -46,20 +46,8 @@ struct FavoriteStockView: View {
             Spacer()
             VStack(alignment: .trailing) {
                 Text(quote.currentPrice.formatted(.currency(code: "USD")))
-                HStack {
-                    switch quote.change {
-                    case ..<0:
-                        Image(systemName: "circle")
-                            .foregroundStyle(.red)
-                    case 0:
-                        Image(systemName: "circle")
-                            .foregroundStyle(.gray)
-                    default:
-                        Image(systemName: "circle")
-                            .foregroundStyle(.green)
-                    }
-                    Text("\(quote.change.formatted(.currency(code: "USD"))) (\(quote.changeInPercent.formatted(.percent)))")
-                }
+                PriceChangeLabel(changeInPrice: quote.change, changeInPercent: quote.changeInPercent)
+
             }
         }
     }
