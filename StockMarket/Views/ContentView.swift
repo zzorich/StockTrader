@@ -24,7 +24,6 @@ struct ContentView: View {
                         .navigationBarTitleDisplayMode(.inline)
                 }
         }
-        .searchable(text: $searchViewModel.searchKeyWord)
 
     }
 }

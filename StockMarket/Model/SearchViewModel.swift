@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 import Combine
 
-private let requestHeader = "https://durable-melody-413101.nn.r.appspot.com/search/autocomplete"
+private let requestHeader = client.endPoint("/search/autocomplete")
 
 struct AutoSuggestionsResponse: POD {
     let searchKeyword: String?
@@ -59,7 +59,7 @@ class SearchViewModel: ObservableObject {
         }
 
         searchTask = Task { @MainActor in
-            let response =  await AF.request(requestHeader, method: .get, parameters: ["search_keyword": query])
+            let response =  await AF.request(requestHeader!, method: .get, parameters: ["search_keyword": query])
                 .serializingDecodable(AutoSuggestionsResponse.self, automaticallyCancelling: true)
                 .response.map { response in
                     response.searchResults

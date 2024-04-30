@@ -11,7 +11,7 @@ import SwiftUI
 @MainActor
 struct StockMarketApp: App {
 
-    private var portfolio = PortfolioViewModel.test
+    private var portfolio = PortfolioViewModel()
     var body: some Scene {
         WindowGroup {
             ContentView()

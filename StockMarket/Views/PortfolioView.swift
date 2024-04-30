@@ -16,6 +16,21 @@ struct PortfolioView: View {
     @EnvironmentObject private var searchViewModel: SearchViewModel
 
     var body: some View {
+        switch portfolio.loadingState {
+        case .loaded:
+            loadedBody
+                .searchable(text: $searchViewModel.searchKeyWord)
+                .onAppear(perform: {
+                    portfolio.reloadDataIfNeeded()
+                })
+        case .failed(error: let error):
+            Text(error.localizedDescription)
+        case .isLoading:
+            ProgressView()
+        }
+    }
+
+    var loadedBody: some View {
         List {
             if isSearching {
                 switch searchViewModel.state {
@@ -42,23 +57,35 @@ struct PortfolioView: View {
                     Text(Date.now.formatted(.dateTime))
                         .font(.largeTitle)
                 }
-                Section("PORTFOLIO") {
-                    assetsHeader
-                    ForEach(portfolio.stocksOwned) { stock in
-                        if let stockQuote = portfolio.quote(of: stock.id) {
-                            OwnedStockInfoView(stock: stock, stockQuote: stockQuote)
+                if !portfolio.stocksOwned.isEmpty {
+                    Section("PORTFOLIO") {
+                        VStack {
+                            assetsHeader
+                            Divider()
+                            ForEach(portfolio.stocksOwned.keys.sorted(by: <)) { stock in
+                                if let stockQuote = portfolio.quote(of: stock), let ownedInfo = portfolio.stocksOwned[stock] {
+                                    NavigationLink(value: DetailStockItem(symbol: stock.symbol)) {
+                                        OwnedStockInfoView(stock: ownedInfo, stockQuote: stockQuote)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
 
-                Section("FAVORITE") {
-                    ForEach(portfolio.favorites) { stock in
-                        if let quote = portfolio.quote(of: stock) {
-                            FavoriteStockView(stock: stock, quote: quote)
+                if !portfolio.favorites.isEmpty {
+                    Section("FAVORITE") {
+                        ForEach(portfolio.favorites, id: \.stockSymbol) { stock in
+                            let id = StockIdentifier(symbol: stock.stockSymbol)
+                            if let quote = portfolio.quote(of: id) {
+                                NavigationLink(value: DetailStockItem(symbol: stock.stockSymbol)) {
+                                    FavoriteStockView(stock: id, quote: quote)
+                                }
+                            }
                         }
+                        .onDelete(perform: portfolio.removeFavoriteStocks(at:))
+                        .onMove(perform: portfolio.removeFavorites(from:to:))
                     }
-                    .onDelete(perform: portfolio.removeFavoriteStocks(at:))
-                    .onMove(perform: portfolio.removeFavorites(from:to:))
                 }
             }
         }
@@ -68,7 +95,6 @@ struct PortfolioView: View {
         })
         .toasted(isShowingToast: $isShowingErrorToast, message: errorMessage)
     }
-
     var assetsHeader: some View {
         HStack {
             VStack(alignment: .leading) {
@@ -84,10 +110,4 @@ struct PortfolioView: View {
             }
         }
     }
-}
-
-#Preview {
-    PortfolioView()
-        .environment(PortfolioViewModel.test)
-        .environmentObject(SearchViewModel())
 }

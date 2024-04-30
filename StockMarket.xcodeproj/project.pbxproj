@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4F5406C82BE0EDA80024AD90 /* TradingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5406C72BE0EDA80024AD90 /* TradingView.swift */; };
+		4F5406CA2BE0FECA0024AD90 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5406C92BE0FECA0024AD90 /* APIClient.swift */; };
 		4F66A31F2BD104BD0034A5CD /* DetailedStockInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F66A31E2BD104BD0034A5CD /* DetailedStockInfoView.swift */; };
 		4F66A3212BD10BAF0034A5CD /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F66A3202BD10BAF0034A5CD /* WebView.swift */; };
 		4F66A3232BD10F890034A5CD /* DetailedStockInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F66A3222BD10F890034A5CD /* DetailedStockInfoViewModel.swift */; };
@@ -28,6 +30,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4F5406C72BE0EDA80024AD90 /* TradingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingView.swift; sourceTree = "<group>"; };
+		4F5406C92BE0FECA0024AD90 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		4F66A31E2BD104BD0034A5CD /* DetailedStockInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedStockInfoView.swift; sourceTree = "<group>"; };
 		4F66A3202BD10BAF0034A5CD /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		4F66A3222BD10F890034A5CD /* DetailedStockInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedStockInfoViewModel.swift; sourceTree = "<group>"; };
@@ -106,6 +110,7 @@
 				4FD3A0102BB94DAE00C5A20D /* SearchViewModel.swift */,
 				4F66A3222BD10F890034A5CD /* DetailedStockInfoViewModel.swift */,
 				4F66A3282BD640900034A5CD /* Router.swift */,
+				4F5406C92BE0FECA0024AD90 /* APIClient.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -122,6 +127,7 @@
 				4F66A3202BD10BAF0034A5CD /* WebView.swift */,
 				4F66A3242BD11F690034A5CD /* ToastView.swift */,
 				4FA430C72BDE4488004072DE /* NewDetailView.swift */,
+				4F5406C72BE0EDA80024AD90 /* TradingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -202,6 +208,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F5406C82BE0EDA80024AD90 /* TradingView.swift in Sources */,
+				4F5406CA2BE0FECA0024AD90 /* APIClient.swift in Sources */,
 				4FD3A0052BB8E56700C5A20D /* Portfolio.swift in Sources */,
 				4F66A3212BD10BAF0034A5CD /* WebView.swift in Sources */,
 				4FD3A0112BB94DAE00C5A20D /* SearchViewModel.swift in Sources */,

@@ -8,35 +8,22 @@
 import SwiftUI
 
 struct OwnedStockInfoView: View {
-    let stock: OwnedStockInfo
+    let stock: InitialData.OwnedStock
     let stockQuote: StockQuote
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(stock.id.symbol)
+                Text(stock.stockSymbol)
                     .bold()
                     .font(.largeTitle)
-                Text("\(stock.numberOfSharesOwned) shares")
+                Text("\(stock.quantity) shares")
                     .font(.subheadline)
                     .foregroundStyle(.gray)
             }
             Spacer()
             VStack(alignment: .trailing) {
                 Text(stockQuote.currentPrice.formatted(.currency(code: "USD")))
-                HStack {
-                    switch stockQuote.change {
-                    case ..<0:
-                        Image(systemName: "circle")
-                            .foregroundStyle(.red)
-                    case 0:
-                        Image(systemName: "circle")
-                            .foregroundStyle(.gray)
-                    default:
-                        Image(systemName: "circle")
-                            .foregroundStyle(.green)
-                    }
-                    Text("\(stockQuote.change.formatted(.currency(code: "USD"))) (\(stockQuote.changeInPercent.formatted(.percent)))")
-                }
+                PriceChangeLabel(changeInPrice: stockQuote.currentPrice - stock.cost, changeInPercent: (stockQuote.currentPrice - stock.cost) / 100)
             }
         }
     }

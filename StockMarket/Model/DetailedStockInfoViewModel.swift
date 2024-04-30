@@ -8,7 +8,7 @@
 import Foundation
 import Alamofire
 
-private let requestHeader = "https://durable-melody-413101.nn.r.appspot.com/detailed_stock_info/details"
+private let requestHeader = client.endPoint("/detailed_stock_info/details")
 
 @Observable
 class DetailedStockInfoViewModel {
@@ -24,7 +24,7 @@ class DetailedStockInfoViewModel {
 
     init(stockSymbol: String) {
         task = Task { @MainActor in
-            let response = await AF.request(requestHeader, method: .get, parameters: ["symbol": stockSymbol])
+            let response = await AF.request(requestHeader!, method: .get, parameters: ["symbol": stockSymbol])
                 .serializingDecodable(StockInfo.self, automaticallyCancelling: true)
                 .response
 
