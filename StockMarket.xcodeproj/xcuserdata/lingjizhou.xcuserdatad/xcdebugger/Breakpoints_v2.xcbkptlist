@@ -194,36 +194,6 @@
             endingLineNumber = "109"
             landmarkName = "body"
             landmarkType = "24">
-            <Locations>
-               <Location
-                  uuid = "A80B859B-92A8-4972-A10F-BA44EC3D1D4B - a8f15a35d91d05d2"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 () -&gt; () in closure #2 () -&gt; Swift.Optional&lt;SwiftUI.Button&lt;SwiftUI.Label&lt;SwiftUI.Text, SwiftUI.Image&gt;&gt;&gt; in StockMarket.DetailStockInfoView.body.getter : some"
-                  moduleName = "StockMarket"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/lingjizhou/Developer/Graphics/StockMarket/StockMarket/Views/DetailedStockInfoView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "109"
-                  endingLineNumber = "109">
-               </Location>
-               <Location
-                  uuid = "A80B859B-92A8-4972-A10F-BA44EC3D1D4B - 2e8b63d566d2ce59"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for closure #1 @Sendable () async -&gt; () in closure #2 () -&gt; () in closure #2 () -&gt; SwiftUI.Button&lt;SwiftUI.Label&lt;SwiftUI.Text, SwiftUI.Image&gt;&gt; in StockMarket.DetailStockInfoView.body.getter : some"
-                  moduleName = "StockMarket"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/lingjizhou/Developer/Graphics/StockMarket/StockMarket/Views/DetailedStockInfoView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "109"
-                  endingLineNumber = "109">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
