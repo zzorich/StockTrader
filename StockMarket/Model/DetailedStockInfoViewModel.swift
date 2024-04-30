@@ -173,7 +173,7 @@ extension DetailedStockInfoViewModel {
         let id: Int
         let datetime: Int
         let headline: String
-        let imageUrl: URL?
+        let imageUrl: URL
         let related: String
         let source: String
         let summary: String

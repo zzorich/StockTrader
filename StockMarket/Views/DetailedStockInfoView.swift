@@ -79,9 +79,9 @@ struct DetailStockInfoView: View {
 
                 Text("News")
                     .bold()
-                if let firstNew = stockInfo.news.first, let imageURL = firstNew.imageUrl {
+                if let firstNew = stockInfo.news.first {
                     VStack(alignment: .leading) {
-                        AsyncImage(url: imageURL) { image in
+                        AsyncImage(url: firstNew.imageUrl) { image in
                             image.resizable()
                                 .scaledToFit()
                                 .clipShape(RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/))
@@ -305,13 +305,25 @@ private struct NewCellView: View {
     let new: VM.New
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("\(new.source),  \(new.date.timeIntervalSinceNowDescription)")
-                .font(.footnote)
-                .foregroundStyle(.gray)
-            Text(new.headline)
-                .font(.headline)
-            Text("")
+        HStack {
+            VStack(alignment: .leading) {
+                Text("\(new.source),  \(new.date.timeIntervalSinceNowDescription)")
+                    .font(.footnote)
+                    .foregroundStyle(.gray)
+                Text(new.headline)
+                    .font(.headline)
+                Text("")
+            }
+            Spacer()
+            AsyncImage(url: new.imageUrl) { image in
+                image
+                    .resizable()
+                    .aspectRatio(1, contentMode: .fit)
+                    .clipShape(RoundedRectangle(cornerRadius: 10.0))
+                    .frame(width: 50, height: 50)
+            } placeholder: {
+                ProgressView()
+            }
         }
     }
 }
