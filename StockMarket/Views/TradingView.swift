@@ -154,6 +154,7 @@ struct TradingView: View {
                                 .foregroundStyle(.green)
                         }
                 }
+                .padding()
             }
             .foregroundStyle(.white)
         }

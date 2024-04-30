@@ -44,37 +44,40 @@ struct PortfolioLoadedView: View {
                         .font(.largeTitle)
                 }
 
-                if !portfolio.stocksOwned.isEmpty {
-                    Section("PORTFOLIO") {
-                        assetsHeader
-                        ForEach(portfolio.stocksOwned, id: \.stockSymbol) { ownedStockInfo in
-                            if let stockQuote = portfolio.quote(of: ownedStockInfo.stockSymbol) {
-                                NavigationLink(value: DetailStockItem(symbol: ownedStockInfo.stockSymbol)) {
-                                    OwnedStockInfoView(stock: ownedStockInfo, stockQuote: stockQuote)
-                                }
+                Section("PORTFOLIO") {
+                    assetsHeader
+                    ForEach(portfolio.stocksOwned, id: \.stockSymbol) { ownedStockInfo in
+                        if let stockQuote = portfolio.quote(of: ownedStockInfo.stockSymbol) {
+                            NavigationLink(value: DetailStockItem(symbol: ownedStockInfo.stockSymbol)) {
+                                OwnedStockInfoView(stock: ownedStockInfo, stockQuote: stockQuote)
                             }
                         }
-                        .onMove(perform: { indices, newOffset in
-                            portfolio.stocksOwned.move(fromOffsets: indices, toOffset: newOffset)
-                        })
                     }
+                    .onMove(perform: { indices, newOffset in
+                        portfolio.stocksOwned.move(fromOffsets: indices, toOffset: newOffset)
+                    })
                 }
 
-                if !portfolio.favorites.isEmpty {
-                    Section("FAVORITE") {
-                        ForEach(portfolio.favorites, id: \.stockSymbol) { stock in
-                            let id = StockIdentifier(symbol: stock.stockSymbol)
-                            if let quote = portfolio.quote(of: id) {
-                                NavigationLink(value: DetailStockItem(symbol: stock.stockSymbol)) {
-                                    FavoriteStockView(stock: id, quote: quote)
-                                }
+                Section("FAVORITE") {
+                    ForEach(portfolio.favorites, id: \.stockSymbol) { stock in
+                        let id = StockIdentifier(symbol: stock.stockSymbol)
+                        if let quote = portfolio.quote(of: id) {
+                            NavigationLink(value: DetailStockItem(symbol: stock.stockSymbol)) {
+                                FavoriteStockView(stock: id, quote: quote)
                             }
                         }
-                        .onDelete(perform: portfolio.removeFavoriteStocks(at:))
-                        .onMove(perform: { indices, newOffset in
-                            portfolio.favorites.move(fromOffsets: indices, toOffset: newOffset)
-                        })
                     }
+                    .onDelete(perform: portfolio.removeFavoriteStocks(at:))
+                    .onMove(perform: { indices, newOffset in
+                        portfolio.favorites.move(fromOffsets: indices, toOffset: newOffset)
+                    })
+                }
+
+                Section {
+                    Text("Powered by Finnhub.io")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
         }
