@@ -72,6 +72,7 @@ extension DetailedStockInfoViewModel {
         let changePrice: Double
         let changePercent: Double
         let isMarketOpen: Bool
+        let logo: URL?
 
         enum CodingKeys: String, CodingKey {
             case stockSymbol = "symbol"
@@ -80,6 +81,7 @@ extension DetailedStockInfoViewModel {
             case changePrice = "change_price"
             case changePercent = "change_percent"
             case isMarketOpen = "is_market_open"
+            case logo
         }
     }
     

@@ -14,9 +14,9 @@
             filePath = "StockMarket/Model/Portfolio.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "320"
-            endingLineNumber = "320"
-            landmarkName = "addFavorite(stockSymbol:)"
+            startingLineNumber = "319"
+            endingLineNumber = "319"
+            landmarkName = "addfavorite(stockSymbol:companyName:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -30,9 +30,9 @@
             filePath = "StockMarket/Model/Portfolio.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "319"
-            endingLineNumber = "319"
-            landmarkName = "addFavorite(stockSymbol:)"
+            startingLineNumber = "318"
+            endingLineNumber = "318"
+            landmarkName = "addfavorite(stockSymbol:companyName:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -46,8 +46,8 @@
             filePath = "StockMarket/Model/Portfolio.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "377"
-            endingLineNumber = "377"
+            startingLineNumber = "376"
+            endingLineNumber = "376"
             landmarkName = "buy(stockSymbol:stockPrice:numberOfShares:companyName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -62,8 +62,8 @@
             filePath = "StockMarket/Model/Portfolio.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "386"
-            endingLineNumber = "386"
+            startingLineNumber = "385"
+            endingLineNumber = "385"
             landmarkName = "buy(stockSymbol:stockPrice:numberOfShares:companyName:)"
             landmarkType = "7">
          </BreakpointContent>

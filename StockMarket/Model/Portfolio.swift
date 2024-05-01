@@ -105,7 +105,6 @@ class PortfolioViewModel {
         Timer.publish(every: 15, on: .main, in: .common).autoconnect()
             .sink { [weak self] _ in
                 guard let self else { return }
-                isDataDirty = true
                 updateData()
             }
             .store(in: &subscriptions)
@@ -199,9 +198,9 @@ extension PortfolioViewModel {
 
     func updateData() {
         loadingState = .isLoading
-        Task(priority: .high) {
-            let reloadParameters = ReloadParameter(favorites: favorites.map({$0.stockSymbol}), portfolios: stocksOwned.map({$0.stockSymbol}))
-            let response = await AF.request(mainInfoURL!, method: .get, parameters: reloadParameters, encoder: JSONParameterEncoder.default)
+        Task {
+            let reloadData = ReloadParameter(favorites: favorites.map({$0.stockSymbol}), portfolios: stocksOwned.map({$0.stockSymbol}))
+            let response = await AF.request(mainInfoURL!, method: .post, parameters: reloadData, encoder: JSONParameterEncoder.default)
                 .serializingDecodable(InitialData.self, automaticallyCancelling: true)
                 .response
 
@@ -313,8 +312,8 @@ extension PortfolioViewModel {
     }
 
 
-    func addFavorite(stockSymbol: String) async -> Bool {
-        guard let code = await AF.request(addFavoriteURL!, method: .post, parameters: ["symbol": stockSymbol], encoder: JSONParameterEncoder.default).serializingData().response.response?.statusCode else { return false }
+    func addfavorite(stockSymbol: String, companyName: String) async -> Bool {
+        guard let code = await AF.request(addFavoriteURL!, method: .post, parameters: ["symbol": stockSymbol, "company": companyName], encoder: JSONParameterEncoder.default).serializingData().response.response?.statusCode else { return false }
 
         if code == 200 {
             isDataDirty = true
