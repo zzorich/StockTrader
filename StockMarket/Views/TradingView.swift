@@ -44,7 +44,7 @@ struct TradingView: View {
             HStack(alignment: .lastTextBaseline) {
                 TextField("0", value: $selectedNumberOfShares, format: .number)
                     .font(.system(size: 80))
-                    .keyboardType(.decimalPad)
+                    .keyboardType(.numberPad)
                 Text("Shares")
                     .font(.title)
                     .bold()
