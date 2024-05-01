@@ -21,12 +21,12 @@ enum TradingState {
 }
 
 struct TradingView: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var tradingState: TradingState = .trading
     @State private var showingToast: Bool = false
     @State private var toastMessage: String = ""
 
     @EnvironmentObject private var router: Router
-    @Environment(\.dismiss) private var dismiss
     let stockInfo: VM.BasicInfo
     @State private var selectedNumberOfShares: UInt? = nil
     @Environment(PortfolioViewModel.self) private var portfolio
@@ -37,6 +37,13 @@ struct TradingView: View {
     @MainActor
     private var tradingBody: some View {
       VStack {
+          Button {
+              dismiss()
+          } label: {
+              Image(systemName: "xmark.circle")
+          }
+          .frame(maxWidth: .infinity, alignment: .topTrailing)
+
             Text("Trade \(stockInfo.companyName) shares")
                 .font(.title)
                 .bold()
