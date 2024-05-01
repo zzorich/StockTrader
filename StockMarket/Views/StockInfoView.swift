@@ -30,16 +30,16 @@ struct OwnedStockInfoView: View {
 }
 
 struct FavoriteStockView: View {
-    let stock: StockIdentifier
+    let stock: InitialData.Favorite
     let quote: StockQuote
 
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(stock.symbol)
+                Text(stock.stockSymbol)
                     .bold()
                     .font(.largeTitle)
-                Text(stock.symbol)
+                Text(stock.companyName)
                     .font(.subheadline)
                     .foregroundStyle(.gray)
             }

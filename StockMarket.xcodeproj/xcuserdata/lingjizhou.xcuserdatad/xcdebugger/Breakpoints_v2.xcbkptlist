@@ -14,8 +14,8 @@
             filePath = "StockMarket/Model/Portfolio.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "247"
-            endingLineNumber = "247"
+            startingLineNumber = "320"
+            endingLineNumber = "320"
             landmarkName = "addFavorite(stockSymbol:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "StockMarket/Model/Portfolio.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "246"
-            endingLineNumber = "246"
+            startingLineNumber = "319"
+            endingLineNumber = "319"
             landmarkName = "addFavorite(stockSymbol:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "StockMarket/Model/Portfolio.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "304"
-            endingLineNumber = "304"
+            startingLineNumber = "377"
+            endingLineNumber = "377"
             landmarkName = "buy(stockSymbol:stockPrice:numberOfShares:companyName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -62,8 +62,8 @@
             filePath = "StockMarket/Model/Portfolio.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "313"
-            endingLineNumber = "313"
+            startingLineNumber = "386"
+            endingLineNumber = "386"
             landmarkName = "buy(stockSymbol:stockPrice:numberOfShares:companyName:)"
             landmarkType = "7">
          </BreakpointContent>

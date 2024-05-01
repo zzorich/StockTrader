@@ -8,6 +8,7 @@
 import Foundation
 import Observation
 import Alamofire
+import Combine
 
 
 
@@ -46,9 +47,11 @@ struct InitialData: POD {
     }
     struct Favorite: POD {
         let stockSymbol: String
+        let companyName: String
 
         enum CodingKeys: String, CodingKey {
             case stockSymbol = "symbol"
+            case companyName = "company"
         }
     }
 
@@ -94,10 +97,20 @@ struct StockIdentifier: Identifiable, Hashable, Equatable, Comparable {
 
 @Observable
 class PortfolioViewModel {
+    private var subscriptions = Set<AnyCancellable>()
+
     @MainActor
     init() {
         fetchIntialData()
+        Timer.publish(every: 15, on: .main, in: .common).autoconnect()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                isDataDirty = true
+                updateData()
+            }
+            .store(in: &subscriptions)
     }
+
 
     enum LoadingState {
         case isLoading
@@ -168,6 +181,10 @@ private func fetchQuote(of stock: String) async throws -> StockQuote {
     }
 }
 
+struct ReloadParameter: POD {
+    let favorites: [String]
+    let portfolios: [String]
+}
 // API Requests
 @MainActor
 extension PortfolioViewModel {
@@ -178,6 +195,62 @@ extension PortfolioViewModel {
         loadingState = .isLoading
         fetchIntialData()
         isDataDirty = false
+    }
+
+    func updateData() {
+        loadingState = .isLoading
+        Task(priority: .high) {
+            let reloadParameters = ReloadParameter(favorites: favorites.map({$0.stockSymbol}), portfolios: stocksOwned.map({$0.stockSymbol}))
+            let response = await AF.request(mainInfoURL!, method: .get, parameters: reloadParameters, encoder: JSONParameterEncoder.default)
+                .serializingDecodable(InitialData.self, automaticallyCancelling: true)
+                .response
+
+            var mainInfo: InitialData?
+            switch response.result {
+            case .success(let _mainInfo):
+                mainInfo = _mainInfo
+            case .failure(let failure):
+                loadingState = .failed(error: failure)
+                debugPrint(String(data: response.data ?? Data(), encoding: .utf8) ?? "")
+            }
+
+            guard let mainInfo else { return }
+
+            let allStocks =
+            Set(
+                mainInfo.favorite.map ({ favorite in
+                    favorite.stockSymbol
+                })
+                +
+                mainInfo.ownedStock.map({ stock in
+                    stock.stockSymbol
+                })
+            )
+
+            do {
+                try await withThrowingTaskGroup(of: StockQuote.self) { group in
+                    allStocks.forEach { stock in
+                        group.addTask {
+                            try await fetchQuote(of: stock)
+                        }
+
+                    }
+
+                    for try await quote in group {
+                        self.allStocks[StockIdentifier(symbol: quote.stockSymbol)] = quote
+                    }
+
+                    self.favorites = mainInfo.favorite
+                    self.stocksOwned = mainInfo.ownedStock
+
+                    cashBalance = mainInfo.user.balance
+                }
+            } catch {
+                loadingState = .failed(error: error)
+            }
+
+            loadingState = .loaded
+        }
     }
 
     func fetchIntialData() {

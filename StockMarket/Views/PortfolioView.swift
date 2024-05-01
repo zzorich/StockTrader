@@ -60,10 +60,9 @@ struct PortfolioLoadedView: View {
 
                 Section("FAVORITE") {
                     ForEach(portfolio.favorites, id: \.stockSymbol) { stock in
-                        let id = StockIdentifier(symbol: stock.stockSymbol)
-                        if let quote = portfolio.quote(of: id) {
+                        if let quote = portfolio.quote(of: stock.stockSymbol) {
                             NavigationLink(value: DetailStockItem(symbol: stock.stockSymbol)) {
-                                FavoriteStockView(stock: id, quote: quote)
+                                FavoriteStockView(stock: stock, quote: quote)
                             }
                         }
                     }
