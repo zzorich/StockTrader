@@ -142,6 +142,9 @@ class PortfolioViewModel {
 
 }
 
+private let refreshDataURL: URL? = {
+    client.endPointInDataBase("/refresh")
+}()
 
 private let mainInfoURL: URL? = {
     client.endPointInDataBase("/main_info")
@@ -200,7 +203,7 @@ extension PortfolioViewModel {
         loadingState = .isLoading
         Task {
             let reloadData = ReloadParameter(favorites: favorites.map({$0.stockSymbol}), portfolios: stocksOwned.map({$0.stockSymbol}))
-            let response = await AF.request(mainInfoURL!, method: .post, parameters: reloadData, encoder: JSONParameterEncoder.default)
+            let response = await AF.request(refreshDataURL!, method: .post, parameters: reloadData, encoder: JSONParameterEncoder.default)
                 .serializingDecodable(InitialData.self, automaticallyCancelling: true)
                 .response
 
@@ -323,6 +326,18 @@ extension PortfolioViewModel {
         }
     }
 
+
+    func removeFavorite(stockSymbol: String) async -> Bool {
+        guard let code = await AF.request(removeFavoriteURL!, method: .post, parameters: ["symbol": stockSymbol], encoder: JSONParameterEncoder.default).serializingData().response.response?.statusCode else { return false }
+
+        favorites.removeAll(where: {$0.stockSymbol == stockSymbol})
+        if code == 200 {
+            return true
+        } else {
+            isDataDirty = false
+            return false
+        }
+    }
     func postRemoveFavorite(stockSymbol: String) {
         Task {
             guard let code = await AF.request(removeFavoriteURL!, method: .post, parameters: ["symbol": stockSymbol], encoder: JSONParameterEncoder.default).serializingData().response.response?.statusCode else { return }

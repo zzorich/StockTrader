@@ -119,16 +119,30 @@ struct DetailStockInfoView: View {
             let symbol = stockInfo.basicInfo.stockSymbol
             let canAdd = !vm.favorites.map({$0.stockSymbol}).contains(symbol)
             Button("Add to faveroites", systemImage: canAdd ? "plus.circle" : "plus.circle.fill") {
-                guard canAdd else { return }
-                withAnimation {
-                    addFavoriteMessage = "Adding \(symbol) to favorites"
-                    isShowingAddFavoriteToast = true
-                }
-                Task {
-                    let isAdded = await vm.addfavorite(stockSymbol: symbol, companyName: stockInfo.basicInfo.companyName)
-                    DispatchQueue.main.asyncAfter(deadline: .now()+1) {
-                        withAnimation {
-                            isShowingAddFavoriteToast = false
+                if canAdd {
+                    withAnimation {
+                        addFavoriteMessage = "Adding \(symbol) to favorites"
+                        isShowingAddFavoriteToast = true
+                    }
+                    Task {
+                        let isAdded = await vm.addfavorite(stockSymbol: symbol, companyName: stockInfo.basicInfo.companyName)
+                        DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                            withAnimation {
+                                isShowingAddFavoriteToast = false
+                            }
+                        }
+                    }
+                } else {
+                    withAnimation {
+                        addFavoriteMessage = "removing \(symbol) to favorites"
+                        isShowingAddFavoriteToast = true
+                    }
+                    Task {
+                        let isRemoved = await vm.removeFavorite(stockSymbol: symbol)
+                        DispatchQueue.main.asyncAfter(deadline: .now()+1) {
+                            withAnimation {
+                                isShowingAddFavoriteToast = false
+                            }
                         }
                     }
                 }
@@ -163,7 +177,7 @@ private struct BasicInfoHeader: View {
                     PriceChangeLabel(changeInPrice: info.changePrice, changeInPercent: info.changePercent)
                 }
             }
-            
+
             Spacer()
             AsyncImage(url: info.logo) { image in
                 image
