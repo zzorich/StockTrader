@@ -17,8 +17,8 @@ struct PortfolioLoadedView: View {
     let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        List {
-            if isSearching {
+        if isSearching {
+            List {
                 switch searchViewModel.state {
                 case .isLoading:
                     ProgressView()
@@ -37,8 +37,10 @@ struct PortfolioLoadedView: View {
                 case .success(let searchItems):
                     SearchView(searchItems: searchItems)
                 }
+            }
 
-            } else {
+        } else {
+            List {
                 Section {
                     Text(Date.now.formatted(.dateTime.day().month(.wide).year()))
                         .foregroundStyle(.secondary)
@@ -79,15 +81,15 @@ struct PortfolioLoadedView: View {
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
+
             }
+            .toolbar(content: {
+                EditButton()
+            })
+            .onReceive(timer, perform: { _ in
+                portfolio.updateData()
+            })
         }
-        .onReceive(timer, perform: { _ in
-            portfolio.updateData()
-        })
-        .toolbar(content: {
-            EditButton()
-        })
-        .toasted(isShowingToast: $isShowingErrorToast, message: errorMessage)
     }
     var assetsHeader: some View {
         HStack {
