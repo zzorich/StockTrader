@@ -74,7 +74,7 @@ struct PortfolioLoadedView: View {
                 }
 
                 Section {
-                    Text("Powered by Finnhub.io")
+                    Link("Powered by Finnhub.io", destination: URL(string: "https://finnhub.io")!)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -119,7 +119,13 @@ struct PortfolioView: View {
         case .failed(error: let error):
             Text(error.localizedDescription)
         case .isLoading:
-            ProgressView()
+            ZStack {
+                // Color for loading View 
+                Color(uiColor: UIColor(hue: 0.67, saturation: 0.08, brightness: 0.95, alpha: 1))
+                Image(.fn)
+                    .resizable()
+                    .scaledToFit()
+            }
         }
     }
 

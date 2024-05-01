@@ -41,11 +41,15 @@ struct DetailStockInfoView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 10) {
                 BasicInfoHeader(info: stockInfo.basicInfo)
+
+                Spacer(minLength: 10)
                 Color.clear
-                    .frame(minHeight: 400)
+                    .frame(minHeight: 450)
                     .overlay {
                         TabCharts(stockInfo: stockInfo)
                     }
+
+                Spacer(minLength: 10)
                 HStack {
                     PortfolioSection(stockInfo: stockInfo)
                     Spacer()
@@ -65,18 +69,24 @@ struct DetailStockInfoView: View {
                     }
                 }
 
+                Spacer(minLength: 10)
                 StatsSection(stats: stockInfo.stats)
 
+                Spacer(minLength: 10)
                 AboutSection(aboutInfo: stockInfo.about)
 
+                Spacer(minLength: 10)
                 InsightsSection(insights: stockInfo.insights)
 
+                Spacer(minLength: 10)
                 WebView(url: stockInfo.charts.recommendationChart)
                     .frame(minHeight: 400)
 
+                Spacer(minLength: 10)
                 WebView(url: stockInfo.charts.historicalEpsChart)
                     .frame(minHeight: 400)
 
+                Spacer(minLength: 10)
                 Text("News")
                     .bold()
                 if let firstNew = stockInfo.news.first {
@@ -227,9 +237,11 @@ private struct InsightsSection: View {
                     .bold()
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text((insights.positiveMSPR+insights.negativeChange).currencyFormated)
+                    .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text((insights.positiveChange+insights.negativeChange).currencyFormated)
+                    .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
             }
@@ -240,8 +252,10 @@ private struct InsightsSection: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text(insights.positiveMSPR.currencyFormated)
+                    .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(insights.positiveChange.currencyFormated)
+                    .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
@@ -256,6 +270,7 @@ private struct InsightsSection: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .font(.callout)
     }
 }
 
@@ -320,7 +335,7 @@ private struct NewCellView: View {
                     .resizable()
                     .aspectRatio(1, contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: 10.0))
-                    .frame(width: 50, height: 50)
+                    .frame(width: 60, height: 60)
             } placeholder: {
                 ProgressView()
             }

@@ -7,9 +7,6 @@
 		<dict/>
 	</array>
 	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIImageName</key>
-		<string>ln.png</string>
-	</dict>
+	<dict/>
 </dict>
 </plist>

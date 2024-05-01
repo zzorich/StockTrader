@@ -140,11 +140,6 @@ struct TradingView: View {
                 Spacer()
                 Button {
                     dismiss()
-                    if info.info == .sold {
-                        debugPrint(router.path.count)
-                        router.path.removeLast(router.path.count)
-                        debugPrint(router.path.count)
-                    }
                 } label: {
                     Capsule()
                         .frame(height: 60)
