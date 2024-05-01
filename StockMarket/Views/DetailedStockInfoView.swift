@@ -69,6 +69,7 @@ struct DetailStockInfoView: View {
                     }
                 }
 
+                // TODO: spacing between different sections
                 Spacer(minLength: 10)
                 StatsSection(stats: stockInfo.stats)
 
