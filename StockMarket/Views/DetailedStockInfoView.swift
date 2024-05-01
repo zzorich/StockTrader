@@ -53,19 +53,17 @@ struct DetailStockInfoView: View {
                 HStack {
                     PortfolioSection(stockInfo: stockInfo)
                     Spacer()
-                    if stockInfo.basicInfo.isMarketOpen {
-                        Button {
-                            tradingInfo = stockInfo.basicInfo
-                        } label: {
-                            ZStack {
-                                Capsule(style: .continuous)
-                                    .fill(Color.green)
-                                Text("Trade")
-                                    .foregroundStyle(.white)
-                            }
-                            .frame(maxWidth: 150)
-                            .frame(height: 60)
+                    Button {
+                        tradingInfo = stockInfo.basicInfo
+                    } label: {
+                        ZStack {
+                            Capsule(style: .continuous)
+                                .fill(Color.green)
+                            Text("Trade")
+                                .foregroundStyle(.white)
                         }
+                        .frame(maxWidth: 150)
+                        .frame(height: 60)
                     }
                 }
 
