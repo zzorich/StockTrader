@@ -14,6 +14,7 @@ struct PortfolioLoadedView: View {
     @Environment(\.isSearching) private var isSearching
     @State private var isShowingErrorToast: Bool = false
     @State private var errorMessage: String = "Failed to load search result"
+    let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
 
     var body: some View {
         List {
@@ -80,6 +81,9 @@ struct PortfolioLoadedView: View {
                 }
             }
         }
+        .onReceive(timer, perform: { _ in
+            portfolio.updateData()
+        })
         .toolbar(content: {
             EditButton()
         })

@@ -97,17 +97,10 @@ struct StockIdentifier: Identifiable, Hashable, Equatable, Comparable {
 
 @Observable
 class PortfolioViewModel {
-    private var subscriptions = Set<AnyCancellable>()
 
     @MainActor
     init() {
         fetchIntialData()
-        Timer.publish(every: 15, on: .main, in: .common).autoconnect()
-            .sink { [weak self] _ in
-                guard let self else { return }
-                updateData()
-            }
-            .store(in: &subscriptions)
     }
 
 
@@ -139,7 +132,6 @@ class PortfolioViewModel {
             partialResult += quote.currentPrice * Double(stock.quantity)
         }
     }
-
 }
 
 private let refreshDataURL: URL? = {
@@ -200,7 +192,6 @@ extension PortfolioViewModel {
     }
 
     func updateData() {
-        loadingState = .isLoading
         Task {
             let reloadData = ReloadParameter(favorites: favorites.map({$0.stockSymbol}), portfolios: stocksOwned.map({$0.stockSymbol}))
             let response = await AF.request(refreshDataURL!, method: .post, parameters: reloadData, encoder: JSONParameterEncoder.default)
@@ -250,8 +241,6 @@ extension PortfolioViewModel {
             } catch {
                 loadingState = .failed(error: error)
             }
-
-            loadingState = .loaded
         }
     }
 
