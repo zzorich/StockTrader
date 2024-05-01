@@ -120,7 +120,7 @@ struct PortfolioView: View {
             Text(error.localizedDescription)
         case .isLoading:
             ZStack {
-                // Color for loading View 
+                // TODO: Color for loading View
                 Color(uiColor: UIColor(hue: 0.67, saturation: 0.08, brightness: 0.95, alpha: 1))
                 Image(.fn)
                     .resizable()
