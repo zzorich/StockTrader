@@ -81,7 +81,6 @@ struct PortfolioLoadedView: View {
                 }
             }
         }
-        .navigationTitle("Stocks")
         .toolbar(content: {
             EditButton()
         })
@@ -119,13 +118,7 @@ struct PortfolioView: View {
         case .failed(error: let error):
             Text(error.localizedDescription)
         case .isLoading:
-            ZStack {
-                // TODO: Color for loading View
-                Color(uiColor: UIColor(hue: 0.67, saturation: 0.08, brightness: 0.95, alpha: 1))
-                Image(.fn)
-                    .resizable()
-                    .scaledToFit()
-            }
+            ProgressView("fetching data")
         }
     }
 

@@ -13,7 +13,8 @@ struct ContentView: View {
     var body: some View {
         NavigationStack(path: $router.path) {
             PortfolioView()
-                .environmentObject(searchViewModel)        
+                .navigationTitle("Stocks")
+                .environmentObject(searchViewModel)
                 .navigationDestination(for: SearchItem.self) { searchItem in
                     DetailedStockInfoContainer(stockIdentifier: searchItem.companySymbol)
                         .navigationBarTitleDisplayMode(.inline)
